@@ -1,0 +1,11 @@
+language: node_js
+node_js: node
+services:
+- mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: STPd5VLHNty0zHOg/mQ/Jf/7BAgM9o93dTEH54SJBPN76QS2dHWJhD6M/qEEd83gwpPPlRd73Ip1/LwFUybUEZQnLAWPv1bFEu8OVBcM1oknYG4Vm2kh6JYwhsPS+5iKuZ4nT4yyTNx3eApWc+70Y0LFTiRFbBT3r6Agt6ioFgGyF21IEX8at/QLt+MCxImCg3b6XKLd9bMddEbfqqIsslm/qRvuLiDOH3DQqT4vY2ywW3WqFgdHrkgfCUKufr1OME0UU7jou3UdYEdLQDfJDUnK7F5b2D8bOS3zQkciC2sPruTaL/2thGT3TCsHM8GG9m5ReO0Gbgwbl+zysPPmHu9UePIY4zyYyIQhBYS7I9FMU1lFErhdnKcC+JKa8XH25q0HreeqzJh3Wzsipb7hTC9knjmjyRiyHT8WklcBAc4xFsRcEpjexXYP9gy3FnKQrqpzuex7YUHLPMUweK4jssSxgSfjpV6qUE5YbzuAydj5pU1itiTnYQ3yAmTyIm73KSv0muyKck3iYXnpvP10Atu8qLlxqszQsfz6DBjaGZXEZCCdZ0N/XR5GE0BZL8U05v85vVuYQ5gNfVNO9jpMA0UO/1rQOIk7xazcerMFl8i36OaLC14dU5nZ3lhRiJ3P15VpAdDqjAFdicUrEhnhMj/8QS7x+Ay0RRrp9k7L9Ug=
+  app: hex-clothes-api
+  on:
+    repo: Saitama2016/hex-clothes-api
