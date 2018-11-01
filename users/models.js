@@ -3,6 +3,23 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
+const outfitSchema = mongoose.Schema({
+    skintone: String,
+    shirt: {
+        type: String,
+        color: String
+    },
+    pants: {
+        type: String,
+        color: String
+    },
+    shoes: {
+        show: Boolean,
+        type: String,
+        color: String
+    }
+});
+
 const UserSchema = mongoose.Schema({
     username: {
         type: String,
@@ -19,24 +36,8 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true,
         unique: true
-    }
-});
-
-const outfitSchema = mongoose.Schema({
-    skintone: String,
-    shirt: {
-        type: String,
-        color: String
     },
-    pants: {
-        type: String,
-        color: String
-    },
-    shoes: {
-        show: Boolean,
-        type: String,
-        color: String
-    }
+    wardrobe: [outfitSchema]
 });
 
 UserSchema.methods.validatePassword = function(password) {
