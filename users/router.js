@@ -1,18 +1,34 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const passport = require('passport');
 
-const { router: authRouter, localStrategy, jwtStrategy } = require('../auth');
+const { router: authRouter, localStrategy } = require('../auth');
 const {User, Outfit} = require('./models');
 
+const config = require('../config');
 const router = express.Router();
 
 passport.use(localStrategy);
-passport.use(jwtStrategy);
+// passport.use(jwtStrategy);
 
 const jwtAuth = passport.authenticate('jwt', { session: false });
 
 router.use(bodyParser.json());
+
+router.post('/', (req, res) => {
+    const requiredFields = ['username', 'password', 'firstName', 'lastName', 'email'];
+    const missingField = requiredFields.find(field => !(field in req.body));
+
+    if (missingField) {
+        return res.status(422).json({
+            code: 422,
+            reason: 'ValidationError',
+            message: 'Missing field',
+            location: missingField
+        });
+    }
+})
 
 router.post('/', (req, res) => {
     const requiredFields = ['username', 'password', 'firstName', 'lastName', 'email'];
@@ -41,11 +57,11 @@ router.post('/', (req, res) => {
         });
     }
 
-    /*
-    If the username and password aren't trimmed we give an error. User might
-    expect that these will work without trimming (i.e. they want the password
-    "foobar ", including the space at the end).
-    */
+//     /*
+//     If the username and password aren't trimmed we give an error. User might
+//     expect that these will work without trimming (i.e. they want the password
+//     "foobar ", including the space at the end).
+//     */
     const explicityTrimmedFields = ['username', 'password'];
     const nonTrimmedField = explicityTrimmedFields.find(
         field => req.body[field].trim() !== req.body[field]
@@ -133,6 +149,65 @@ router.post('/', (req, res) => {
 });
 
 // Set up router for outfits
+router.get('/wardrobe/:id', jwtAuth, (req, res) => {
+    const user = req.params.id;
+    Outfit.find({userID: user})
+    .then(outfits => {res.json(outfits);
+    })
+    .catch(err => {
+        console.error(err);
+        res.status(500).json({message: 'Internal server error'});
+    });
+});
+
+router.post('/wardrobe', jwtAuth, (req,res) => {
+    const requiredFields = ['username', 'skintone', 'shirt', 'pants', 'shoes'];
+    for (let i=0; i < requiredFields.length; i++) {
+        const field = requiredFields[i];
+        if (!(field in req.body)) {
+            const message = `Missing \`${field}\` in request body`;
+            console.error(message);
+            return res.status(400).send(message);
+        }
+    }
+    Outfit.create({
+        username: req.body.username,
+        skintone: req.body.skintone,
+        shirt: req.body.shirt,
+        pants: req.body.pants,
+        shoes: req.body.shoes
+    })
+    .then(outfits => res.status(201).json(outfits))
+    .catch(err => {
+        console.error(err);
+        res.status(500).json({ error: 'Something went wrong' });
+    });
+});
+
+router.put('/wardrobe/:id', jwtAuth, (req,res) => {
+    if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
+        const message = (
+            `Request path id and request body id values must match`
+        );
+        return res.status(400).json({ message: message });
+    }
+    const toUpdate = {};
+    const requiredFields = ['username', 'skintone', 'shirt', 'pants', 'shoes'];
+
+    requiredFields.forEach(field => {
+        if (field in req.body) {
+            toUpdate[field] = req.body[field];
+        }
+    });
+
+    Outfit.findByIdAndUpdate(req.params.username, { $set: toUpdate })
+    .then(() => {
+        console.log(`Updating \`${req.params.username}\``);
+        res.status(204).end();
+    })
+    .catch(err => res.status(500).json({ message: 'Internal server error' }));
+});
+
 
 //Set up CRUD operations for users and outfits
 router.get('/', (req, res) => {

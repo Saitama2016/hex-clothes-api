@@ -1,6 +1,6 @@
 //Act as interface to export modules
 //Create separate variables to export router and strategies
 const {router} = require('./router')
-const {localStrategy, jwtStrategy} = require('./strategies');
+const {localStrategy} = require('./strategies');
 
-module.exports = {router, localStrategy, jwtStrategy};
+module.exports = {router, localStrategy};
