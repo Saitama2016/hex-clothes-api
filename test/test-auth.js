@@ -13,6 +13,7 @@ chai.use(chaiHttp);
 describe('Auth endpoints', function () {
     const username = 'exampleUser';
     const password = 'examplePass';
+    const email = 'example@gmail.com';
 
     before (function () {
         return runServer(TEST_DATABASE_URL);
@@ -26,7 +27,8 @@ describe('Auth endpoints', function () {
         return User.hashPassword(password).then(password => 
             User.create({
                 username,
-                password
+                password,
+                email
             })    
         );
     });
@@ -96,10 +98,10 @@ describe('Auth endpoints', function () {
                     const payload = jwt.verify(token, JWT_SECRET, {
                         algorithms: ['HS256']
                     });
-                    expect(payload.user).to.deep.equal({
+                    expect(payload.user.username).to.equal(
                         username
-                    });
-                    expect(payload.exp).to.be.at.least(decoded.exp);
+                    );
+                    expect(payload.exp).to.be.greaterThan(payload.iat);
                 });
         });
     });

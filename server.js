@@ -33,20 +33,23 @@ passport.use(jwtStrategy);
 // app.get('/api/*', (req,res) => {
 //     res.json({ok: true});
 // });
+const jwtAuth = passport.authenticate('jwt', { session: false});
 
 app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
-
-app.use('*', function(req, res) {
-    res.status(404).json({ message: 'Page Not Found '});
-});
-
-const jwtAuth = passport.authenticate('jwt', { session: false});
 
 app.get('/api/protected', jwtAuth, (req,res) => {
     return res.json({
         data: 'rosebud'
     });
+});
+
+app.get('/api/foo', (req,res) => {
+    res.json({ok: true});
+});
+
+app.use('*', function(req, res) {
+    res.status(404).json({ message: 'Page Not Found '});
 });
 
 let server;
@@ -87,8 +90,6 @@ if (require.main === module) {
     runServer(DATABASE_URL).catch(err => console.error(err));
 }
 
+// app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+
 module.exports = { app, runServer, closeServer };
-
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
-
-module.exports = {runServer, app, closeServer};
