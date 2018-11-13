@@ -135,9 +135,9 @@ router.post('/', (req, res) => {
 });
 
 // Set up router for outfits
-router.get('/wardrobe/:id', jwtAuth, (req, res) => {
-    const user = req.params.id;
-    Outfit.find({userID: user})
+router.get('/wardrobe/:username', jwtAuth, (req, res) => {
+    Outfit
+    .find({username: req.params.username})
     .then(outfits => {res.json(outfits);
     })
     .catch(err => {
@@ -177,20 +177,17 @@ router.put('/wardrobe/:id', jwtAuth, (req,res) => {
         );
         return res.status(400).json({ message: message });
     }
-    const toUpdate = {};
-    const requiredFields = ['username', 'skintone', 'shirt', 'pants', 'shoes'];
+    const updated = {};
+    const updateableFields = ['username', 'skintone', 'shirt', 'pants', 'shoes'];
 
-    requiredFields.forEach(field => {
+    updateableFields.forEach(field => {
         if (field in req.body) {
-            toUpdate[field] = req.body[field];
+            updated[field] = req.body[field];
         }
     });
 
-    Outfit.findByIdAndUpdate(req.params.username, { $set: toUpdate })
-    .then(() => {
-        console.log(`Updating \`${req.params.username}\``);
-        res.status(204).end();
-    })
+    Outfit.findByIdAndUpdate(req.params.id, { $set: updated }, { new: true })
+    .then(updatedOutfit => res.status(204).end())
     .catch(err => res.status(500).json({ message: 'Internal server error' }));
 });
 
@@ -216,10 +213,16 @@ router.delete('/:id', (req, res) => {
     console.log(req.params.id);
     User
         .findByIdAndRemove(req.params.id)
-            .then(() => {
-                console.log(`You have deleted post id:${req.params.id}`);
+        .then(() => {
+            console.log(`You have deleted post id:${req.params.id}`);
+            res.status(204).end();
+        })
+        .catch(err => {
+            console.error(err); 
+            res.status(500).json({ 
+                message: 'Internal server error' 
             })
-            .catch(err => res.status(500).json({ message: 'Internal server error' }));
+        });
 });
 
 module.exports = {router};

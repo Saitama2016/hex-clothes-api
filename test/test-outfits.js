@@ -13,19 +13,17 @@ chai.use(chaiHttp);
 describe('Outfit endpoints', function() {
     const username = 'exampleUser';
     const skintone = '#ffad60';
-    const shirt = "{type: 'long-sleeve-shirt', color: '#FFF'}";
-    const pants = "{type: 'jeans', color: '#0000ff'}";
-    const shoes = "{show: true, type: 'boots', color: '#000'}";
+    const shirt = "{type: long-sleeve-shirt, color: #FFF}";
+    const pants = "{type: jeans, color: #0000ff}";
+    const shoes = "{show: true, type: boots, color: #000}";
 
-    this.timeout(3000);
+    before (function () {
+        return runServer(TEST_DATABASE_URL);
+    });
 
-    // before (function () {
-    //     return runServer(TEST_DATABASE_URL);
-    // });
-
-    // after (function () {
-    //     return closeServer();
-    // });
+    after (function () {
+        return closeServer();
+    });
 
     beforeEach(function () {
         return Outfit.create({
@@ -42,23 +40,38 @@ describe('Outfit endpoints', function() {
     });
 
     describe('/api/users/wardrobe', function() {
-        it('Should reject with no credentials', function(done) {
+        it('Should reject with no credentials', function() {
             return chai
                 .request(app)
                 .post('/api/users/wardrobe')
-                .then(() => {}
-                )
-                .catch(err => {
-                    if (err instanceof chai.AssertionError) {
-                        throw err;
-                    }
-
-                    const res = err.response;
-                    expect(res).to.have.status(400);
-                    done();
+                .send()
+                .then((res) => {
+                    expect(res.ok).to.equal(false);
+                    expect(res).to.has.status(401);
                 })
         });
 
+        it('Should reject if wrong user name', function() {
+            return chai
+                .request(app)
+                .post('/api/users/wardrobe')
+                .send({username: "wrongUser", skintone, shirt, pants, shoes})
+                .then((res) => {
+                    expect(res).to.has.status(401);
+                })
+        });
+
+        it('Should return valid outfit', function() {
+            return chai
+                .request(app)
+                .get(`/api/users/wardrobe/${user}`)
+                .send({username, skintone, shirt, pants, shoes})
+                .then((res) => {
+                    console.log(res.body);
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.be.an(object);
+                })
+        });
 
     });
 });

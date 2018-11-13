@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node .",
-    "test": "mocha --exit"
+    "test": "mocha --timeout 3000"
   },
   "author": "",
   "license": "ISC",

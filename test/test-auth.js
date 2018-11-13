@@ -15,6 +15,8 @@ describe('Auth endpoints', function () {
     const password = 'examplePass';
     const email = 'example@gmail.com';
 
+
+
     before (function () {
         return runServer(TEST_DATABASE_URL);
     });
@@ -42,14 +44,8 @@ describe('Auth endpoints', function () {
             return chai
                 .request(app)
                 .post('/api/auth/login')
-                .then(() => {}
-                )
-                .catch(err => {
-                    if (err instanceof chai.AssertionError) {
-                        throw err;
-                    }
-
-                    const res = err.response;
+                .then((res) => {
+                    expect(res.ok).to.equal(false);
                     expect(res).to.have.status(400);
                 });
         });
@@ -58,14 +54,7 @@ describe('Auth endpoints', function () {
                 .request(app)
                 .post('/api/auth/login')
                 .send({ username: 'wrongUsername', password })
-                .then(() => {}
-                )
-                .catch(err => {
-                    if (err instanceof chai.AssertionError) {
-                        throw err;
-                    }
-
-                    const res = err.response;
+                .then((res) => {
                     expect(res).to.have.status(401);
                 });    
         });
@@ -74,14 +63,7 @@ describe('Auth endpoints', function () {
                 .request(app)
                 .post('/api/auth/login')
                 .send({ username, password: 'wrongPassword' })
-                .then(() => {}
-                )
-                .catch(err => {
-                    if (err instanceof chai.AssertionError) {
-                        throw err;
-                    }
-
-                    const res = err.response;
+                .then((res) => {
                     expect(res).to.have.status(401);
                 });
         });
