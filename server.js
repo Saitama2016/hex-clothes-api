@@ -13,6 +13,8 @@ const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
 mongoose.Promise = global.Promise;
 
 const { PORT, CLIENT_ORIGIN, DATABASE_URL } = require('./config');
+console.log(DATABASE_URL);
+
 
 const app = express();
 
