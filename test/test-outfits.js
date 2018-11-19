@@ -64,7 +64,7 @@ describe('Outfit endpoints', function() {
         it('Should return valid outfit', function() {
             return chai
                 .request(app)
-                .get(`/api/users/wardrobe/${user}`)
+                .get(`/api/users/wardrobe/${username}`)
                 .send({username, skintone, shirt, pants, shoes})
                 .then((res) => {
                     console.log(res.body);
