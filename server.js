@@ -7,25 +7,28 @@ const morgan = require('morgan');
 const cors = require('cors');
 const passport = require('passport');
 
-const { router: usersRouter, outfitRouter } = require('./users');
-const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
-
-mongoose.Promise = global.Promise;
-
-const { PORT, CLIENT_ORIGIN, DATABASE_URL } = require('./config');
-console.log(DATABASE_URL);
-
-
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('common'));
 
-app.use(cors({
-    origin: CLIENT_ORIGIN
-    })
-);
+mongoose.Promise = global.Promise;
+
+app.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(204);
+    }
+    next();
+});
+
+const { PORT, CLIENT_ORIGIN, DATABASE_URL } = require('./config');
+
+const { router: usersRouter} = require('./users');
+const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
 
 
 passport.use(localStrategy);
