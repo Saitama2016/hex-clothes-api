@@ -16,8 +16,9 @@ const jwtAuth = passport.authenticate('jwt', { session: false });
 
 router.use(bodyParser.json());
 
+//Post to register new user
 router.post('/', (req, res) => {
-    const requiredFields = ['username', 'password', 'firstName', 'lastName', 'email'];
+    const requiredFields = ['username', 'password'];
     const missingField = requiredFields.find(field => !(field in req.body));
 
     if (missingField) {
@@ -29,7 +30,7 @@ router.post('/', (req, res) => {
         });
     }
 
-    const stringFields = ['username', 'password', 'firstName', 'lastName', 'email'];
+    const stringFields = ['username', 'password'];
     const nonStringField = stringFields.find(
         field => field in req.body && typeof req.body[field] !== 'string'
     );
@@ -95,7 +96,7 @@ router.post('/', (req, res) => {
         });
     }
 
-    let {username, password, firstName = '', lastName = '', email = ''} = req.body;
+    let {username, password } = req.body;
 
     firstName = firstName.trim();
     lastName = lastName.trim();
