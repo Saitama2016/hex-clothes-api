@@ -98,9 +98,9 @@ router.post('/', (req, res) => {
 
     let {username, password } = req.body;
 
-    firstName = firstName.trim();
-    lastName = lastName.trim();
-    email = email.trim();
+    // firstName = firstName.trim();
+    // lastName = lastName.trim();
+    // email = email.trim();
 
     return User.find({username})
         .count()
@@ -119,9 +119,9 @@ router.post('/', (req, res) => {
             return User.create({
                 username,
                 password: hash,
-                firstName,
-                lastName,
-                email
+                // firstName,
+                // lastName,
+                // email
             });
         })
         .then(user => {
@@ -131,6 +131,7 @@ router.post('/', (req, res) => {
             if (err.reason === 'ValidationError') {
                 return res.status(err.code).json(err);
             }
+            console.log('Failure', err)
             res.status(500).json({code: 500, message: 'Internal server error'});
         });
 });

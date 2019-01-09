@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-const outfitSchema = mongoose.Schema({
+const OutfitSchema = mongoose.Schema({
     username: {
         type: String,
         required: true
@@ -38,10 +38,9 @@ const UserSchema = mongoose.Schema({
     lastName: {type: String, default: ''},
     email: {
         type: String,
-        required: true,
-        unique: true
+        default: ''
     },
-    wardrobe: [outfitSchema]
+    wardrobe: [OutfitSchema]
 });
 
 UserSchema.methods.validatePassword = function(password) {
@@ -52,8 +51,15 @@ UserSchema.statics.hashPassword = function(password) {
     return bcrypt.hash(password, 10);
 };
 
+UserSchema.methods.serialize = function() {
+    return {
+        id: this._id,
+        username: this.username,
+        email: this.email
+    };
+};
 
 const User = mongoose.model('User', UserSchema);
-const Outfit = mongoose.model('Outfit', outfitSchema);
+const Outfit = mongoose.model('Outfit', OutfitSchema);
 
 module.exports = { User, Outfit };

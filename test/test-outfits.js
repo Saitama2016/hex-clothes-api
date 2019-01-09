@@ -64,10 +64,10 @@ describe('Outfit endpoints', function() {
         it('Should return valid outfit', function() {
             return chai
                 .request(app)
-                .get(`/api/users/wardrobe/${outfit}`)
+                .post(`/api/users/wardrobe/`)
                 .send({username, skintone, shirt, pants, shoes})
                 .then((res) => {
-                    console.log(res.body);
+                    console.log(res)
                     expect(res).to.have.status(200);
                     expect(res.body).to.be.an(object);
                 })
