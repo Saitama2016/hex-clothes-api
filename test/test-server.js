@@ -17,12 +17,12 @@ describe('API', function() {
         return closeServer();
     });
 
-    it('should 200 on GET requests', function() {
+    it('should 404 on GET requests', function() {
         return chai
             .request(app)
             .get('/api/foo')
             .then(function(res) {
-                res.should.have.status(200);
+                res.should.have.status(404);
                 res.should.be.json;
             });
     });

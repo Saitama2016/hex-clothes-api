@@ -3,27 +3,6 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-const OutfitSchema = mongoose.Schema({
-    username: {
-        type: String,
-        required: true
-    },
-    skintone: String,
-    shirt: {
-        type: String,
-        color: String
-    },
-    pants: {
-        type: String,
-        color: String
-    },
-    shoes: {
-        show: Boolean,
-        type: String,
-        color: String
-    }
-});
-
 const UserSchema = mongoose.Schema({
     username: {
         type: String,
@@ -39,8 +18,25 @@ const UserSchema = mongoose.Schema({
     email: {
         type: String,
         default: ''
+    }
+});
+
+const OutfitSchema = mongoose.Schema({
+    skintone: String,
+    shirt: {
+        type: String,
+        color: String
     },
-    wardrobe: [OutfitSchema]
+    pants: {
+        type: String,
+        color: String
+    },
+    shoes: {
+        show: Boolean,
+        type: String,
+        color: String
+    },
+    userID: String
 });
 
 UserSchema.methods.validatePassword = function(password) {
@@ -54,10 +50,20 @@ UserSchema.statics.hashPassword = function(password) {
 UserSchema.methods.serialize = function() {
     return {
         id: this._id,
-        username: this.username,
+        username: this.username || '',
         email: this.email
     };
 };
+
+OutfitSchema.methods.serialize = function() {
+    return {
+        username: this.username,
+        skintone: this.skintone,
+        shirt: this.shirt,
+        pants: this.pants,
+        shoes: this.shoes
+    }
+}
 
 const User = mongoose.model('User', UserSchema);
 const Outfit = mongoose.model('Outfit', OutfitSchema);

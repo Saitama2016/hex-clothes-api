@@ -27,7 +27,7 @@ app.use(function (req, res, next) {
 
 const { PORT, CLIENT_ORIGIN, DATABASE_URL } = require('./config');
 
-const { router: usersRouter} = require('./users');
+const { router: usersRouter } = require('./users');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
 
 
