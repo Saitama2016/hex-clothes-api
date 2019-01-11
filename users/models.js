@@ -51,13 +51,14 @@ UserSchema.methods.serialize = function() {
     return {
         id: this._id,
         username: this.username || '',
+        firstName: this.firstName || '',
         email: this.email
     };
 };
 
 OutfitSchema.methods.serialize = function() {
     return {
-        username: this.username,
+        id: this.id,
         skintone: this.skintone,
         shirt: this.shirt,
         pants: this.pants,

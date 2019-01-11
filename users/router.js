@@ -1,12 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 const passport = require('passport');
 
 const { router: authRouter, localStrategy } = require('../auth');
 const {User, Outfit} = require('./models');
 
-const config = require('../config');
 const router = express.Router();
 
 passport.use(localStrategy);
@@ -136,39 +134,56 @@ router.post('/', (req, res) => {
         });
 });
 
-// Set up router for outfits
-router.get('/wardrobe/:username', jwtAuth, (req, res) => {
-    Outfit
-    .find({username: req.params.username})
-    .then(outfits => {res.json(outfits);
-    })
-    .catch(err => {
-        console.error(err);
-        res.status(500).json({message: 'Internal server error'});
-    });
-});
-
-router.post('/wardrobe', jwtAuth, (req,res) => {
-    const requiredFields = ['username', 'skintone', 'shirt', 'pants', 'shoes'];
-    for (let i=0; i < requiredFields.length; i++) {
-        const field = requiredFields[i];
-        if (!(field in req.body)) {
-            const message = `Missing \`${field}\` in request body`;
-            console.error(message);
-            return res.status(400).send(message);
-        }
+router.post('/wardrobe/:id', jwtAuth, (req,res) => {
+    const requiredFields = ['skintone', 'shirt', 'pants', 'shoes', 'userID'];
+    const missingField = requiredFields.find(field => !(field in req.body));
+    
+    if (missingField) {
+        return res.status(422).json({
+            code: 422,
+            reason: 'ValidationError',
+            message: 'Missing field',
+            location: missingField
+        });
     }
-    Outfit.create({
-        username: req.body.username,
-        skintone: req.body.skintone,
-        shirt: req.body.shirt,
-        pants: req.body.pants,
-        shoes: req.body.shoes
+
+    const user = req.params.id;
+
+    if(req.body.userID != user) {
+        return res.status(500).json({
+            code: 400,
+            reason: 'ValidationError',
+            message: 'id must match endpont',
+            location: 'userID'
+        });
+    }
+
+    let userID = req.body.userID;
+    let skintone = req.body.skintone;
+    let shirt = req.body.shirt;
+    let pants = req.body.pants;
+    let shoes = req.body.shoes;
+
+    skintone = skintone.trim();
+    shirt = shirt.trim();
+    pants = pants.trim();
+    shoes = shoes.trim();
+    userID = userID.trim();
+
+    return Outfit.create({
+        skintone,
+        shirt,
+        pants,
+        shoes,
+        userID
     })
-    .then(outfits => res.status(201).json(outfits))
+    .then(outfits => res.status(201).json(outfits.serialize()))
     .catch(err => {
-        console.error(err);
-        res.status(500).json({ error: 'Something went wrong' });
+        if (err.reason === 'ValidationError') {
+            return res.status(err.code).json(err);
+        }
+        console.log(err);
+        res.status(500).json({code: 500, message: `Internal server error: ${err}`});
     });
 });
 
@@ -180,7 +195,7 @@ router.put('/wardrobe/:id', jwtAuth, (req,res) => {
         return res.status(400).json({ message: message });
     }
     const updated = {};
-    const updateableFields = ['username', 'skintone', 'shirt', 'pants', 'shoes'];
+    const updateableFields = ['id', 'skintone', 'shirt', 'pants', 'shoes'];
 
     updateableFields.forEach(field => {
         if (field in req.body) {
@@ -189,7 +204,10 @@ router.put('/wardrobe/:id', jwtAuth, (req,res) => {
     });
 
     Outfit.findByIdAndUpdate(req.params.id, { $set: updated }, { new: true })
-    .then(updatedOutfit => res.status(204).end())
+    .then(() => {
+        console.log(`Updating user \`${req.params.id}\``);
+        res.status(204).end();
+    })
     .catch(err => res.status(500).json({ message: 'Internal server error' }));
 });
 
@@ -225,6 +243,44 @@ router.delete('/:id', (req, res) => {
                 message: 'Internal server error' 
             })
         });
+});
+
+router.get('/wardrobe', (req, res) => {
+    return Outfit.find()
+        .then(outfits => res.json(outfits.map(outfit => outfit.serialize())))
+        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
+});
+
+router.get('/wardrobe/:id', jwtAuth, (req, res) => {
+    const user = req.params.id; 
+    Outfit
+        .find({
+            userID: user
+        })
+        .then(outfits => res.json(outfits.map(outfit => outfit.serialize())))
+        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
+});
+
+router.get('/wardrobe/single/:id', jwtAuth, (req, res) => {
+    const id = req.params.id; 
+    Outfit
+        .findById(id)
+        .then(outfit => res.json(outfit.serialize()))
+        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
+});
+
+router.delete('/wardrobe/:id', jwtAuth, (req, res) => {
+    console.log(req.params.id);
+
+    const outfitId = req.params.id;
+
+    Outfit
+    .findByIdAndRemove(outfitId)
+    .then(() => {
+        console.log(`You have deleted user vacation id:${outfitId}`);
+        res.status(204).end();
+    })
+    .catch(err => res.status(500).json({ message: `Internal server error: ${err}` }));
 });
 
 module.exports = {router};
