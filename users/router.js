@@ -2,13 +2,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 
-const { router: authRouter, localStrategy } = require('../auth');
+const { router: authRouter, localStrategy, jwtStrategy } = require('../auth');
 const {User, Outfit} = require('./models');
 
 const router = express.Router();
 
 passport.use(localStrategy);
-// passport.use(jwtStrategy);
+passport.use(jwtStrategy);
 
 const jwtAuth = passport.authenticate('jwt', { session: false });
 
@@ -159,10 +159,10 @@ router.post('/wardrobe/:id', jwtAuth, (req,res) => {
     }
 
     let userID = req.body.userID;
-    let skintone = req.body.skintone;
-    let shirt = req.body.shirt;
-    let pants = req.body.pants;
-    let shoes = req.body.shoes;
+    let skintone = req.body['skintone'];
+    let shirt = req.body['shirt'];
+    let pants = req.body['pants'];
+    let shoes = req.body['shoes'];
 
     skintone = skintone.trim();
     shirt = shirt.trim();
@@ -177,7 +177,10 @@ router.post('/wardrobe/:id', jwtAuth, (req,res) => {
         shoes,
         userID
     })
-    .then(outfits => res.status(201).json(outfits.serialize()))
+    .then(outfits => {
+        console.log(outfits)
+        return res.status(201).json(outfits.serialize())
+    })
     .catch(err => {
         if (err.reason === 'ValidationError') {
             return res.status(err.code).json(err);
@@ -190,25 +193,29 @@ router.post('/wardrobe/:id', jwtAuth, (req,res) => {
 router.put('/wardrobe/:id', jwtAuth, (req,res) => {
     if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
         const message = (
-            `Request path id and request body id values must match`
+            `Request path id and request body id values must match` + 
+            `(${req.body.id}) must match`
         );
+        console.error(message);
         return res.status(400).json({ message: message });
     }
-    const updated = {};
-    const updateableFields = ['id', 'skintone', 'shirt', 'pants', 'shoes'];
+    const toUpdate = {};
+    const requiredFields = ['id', 'skintone', 'shirt', 'pants', 'shoes'];
 
-    updateableFields.forEach(field => {
+    requiredFields.forEach(field => {
         if (field in req.body) {
-            updated[field] = req.body[field];
+            toUpdate[field] = req.body[field];
         }
     });
 
-    Outfit.findByIdAndUpdate(req.params.id, { $set: updated }, { new: true })
+    Outfit
+    .findByIdAndUpdate(req.params.id, { $set: toUpdate })
     .then(() => {
         console.log(`Updating user \`${req.params.id}\``);
         res.status(204).end();
     })
-    .catch(err => res.status(500).json({ message: 'Internal server error' }));
+    .catch((err) => 
+    res.status(500).json({ message: `Internal server error ${err}` }));
 });
 
 

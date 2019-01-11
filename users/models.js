@@ -62,7 +62,8 @@ OutfitSchema.methods.serialize = function() {
         skintone: this.skintone,
         shirt: this.shirt,
         pants: this.pants,
-        shoes: this.shoes
+        shoes: this.shoes,
+        userID: this.userID
     }
 }
 
