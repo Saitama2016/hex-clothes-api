@@ -14,6 +14,7 @@ const jwtAuth = passport.authenticate('jwt', { session: false });
 
 router.use(bodyParser.json());
 
+//Set up CRUD operations for users and outfits
 //Post to register new user
 router.post('/', (req, res) => {
     const requiredFields = ['username', 'password'];
@@ -134,6 +135,38 @@ router.post('/', (req, res) => {
         });
 });
 
+router.get('/', (req, res) => {
+    return User.find()
+        .then(users => res.json(users.map(user => user.serialize())))
+        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
+});
+
+router.get('/:id', (req, res) => {
+    User
+        .findById(req.params.id)
+        .then(post => res.json(post.serialize()))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ message: `Internal server error: ${err}` });
+        });
+});
+
+router.delete('/:id', (req, res) => {
+    console.log(req.params.id);
+    User
+        .findByIdAndRemove(req.params.id)
+        .then(() => {
+            console.log(`You have deleted post id:${req.params.id}`);
+            res.status(204).end();
+        })
+        .catch(err => {
+            console.error(err); 
+            res.status(500).json({ 
+                message: 'Internal server error' 
+            })
+        });
+});
+
 router.post('/wardrobe/:id', jwtAuth, (req,res) => {
     const requiredFields = ['skintone', 'shirt', 'pants', 'shoes', 'userID'];
     const missingField = requiredFields.find(field => !(field in req.body));
@@ -190,6 +223,30 @@ router.post('/wardrobe/:id', jwtAuth, (req,res) => {
     });
 });
 
+router.get('/wardrobe', (req, res) => {
+    return Outfit.find()
+        .then(outfits => res.json(outfits.map(outfit => outfit.serialize())))
+        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
+});
+
+router.get('/wardrobe/:id', jwtAuth, (req, res) => {
+    const user = req.params.id; 
+    Outfit
+        .find({
+            userID: user
+        })
+        .then(outfits => res.json(outfits.map(outfit => outfit.serialize())))
+        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
+});
+
+router.get('/wardrobe/single/:id', jwtAuth, (req, res) => {
+    const id = req.params.id; 
+    Outfit
+        .findById(id)
+        .then(outfit => res.json(outfit.serialize()))
+        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
+});
+
 router.put('/wardrobe/:id', jwtAuth, (req,res) => {
     if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
         const message = (
@@ -216,64 +273,6 @@ router.put('/wardrobe/:id', jwtAuth, (req,res) => {
     })
     .catch((err) => 
     res.status(500).json({ message: `Internal server error ${err}` }));
-});
-
-
-//Set up CRUD operations for users and outfits
-router.get('/', (req, res) => {
-    return User.find()
-        .then(users => res.json(users.map(user => user.serialize())))
-        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
-});
-
-router.get('/:id', (req, res) => {
-    User
-        .findById(req.params.id)
-        .then(post => res.json(post.serialize()))
-        .catch(err => {
-            console.error(err);
-            res.status(500).json({ message: `Internal server error: ${err}` });
-        });
-});
-
-router.delete('/:id', (req, res) => {
-    console.log(req.params.id);
-    User
-        .findByIdAndRemove(req.params.id)
-        .then(() => {
-            console.log(`You have deleted post id:${req.params.id}`);
-            res.status(204).end();
-        })
-        .catch(err => {
-            console.error(err); 
-            res.status(500).json({ 
-                message: 'Internal server error' 
-            })
-        });
-});
-
-router.get('/wardrobe', (req, res) => {
-    return Outfit.find()
-        .then(outfits => res.json(outfits.map(outfit => outfit.serialize())))
-        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
-});
-
-router.get('/wardrobe/:id', jwtAuth, (req, res) => {
-    const user = req.params.id; 
-    Outfit
-        .find({
-            userID: user
-        })
-        .then(outfits => res.json(outfits.map(outfit => outfit.serialize())))
-        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
-});
-
-router.get('/wardrobe/single/:id', jwtAuth, (req, res) => {
-    const id = req.params.id; 
-    Outfit
-        .findById(id)
-        .then(outfit => res.json(outfit.serialize()))
-        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
 });
 
 router.delete('/wardrobe/:id', jwtAuth, (req, res) => {
