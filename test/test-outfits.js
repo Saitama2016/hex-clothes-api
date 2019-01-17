@@ -78,7 +78,7 @@ describe('Outfit endpoints', function() {
                 })
         });
 
-        it.only('Should return valid outfit', function() {
+        it('Should return valid outfit', function() {
             console.log(token)
             return chai.request(app)
             .get(`/api/users/wardrobe/${userID}`)
