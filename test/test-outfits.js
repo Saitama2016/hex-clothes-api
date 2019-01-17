@@ -1,6 +1,7 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 
 const {closeServer, app, runServer} = require('../server');
@@ -13,7 +14,7 @@ let token;
 chai.use(chaiHttp);
 
 describe('Outfit endpoints', function() {
-    const skintone = '#ffad60';
+    const skintone = '#c68642';
     const shirt = "{type: long-sleeve-shirt, color: #FFF}";
     const pants = "{type: jeans, color: #0000ff}";
     const shoes = "{show: true, type: boots, color: #000}";
@@ -28,9 +29,13 @@ describe('Outfit endpoints', function() {
     });
 
     beforeEach(function () {
-            return session.post(`/api/users`)
-                .send({username: 'HulkBuster2015', password: 'SaintSeiya2016'})
-                .then(res => {token = res.body})
+            return session.post('/api/auth/login')
+                .send({
+                    "username": "HulkBuster2015", 
+                    "password": "SaintSeiya2016"})
+                .then(res => {
+                    console.log(res);
+                    token = res})
                 .then(() => {
                 return Outfit.create({
                         skintone,
@@ -43,14 +48,19 @@ describe('Outfit endpoints', function() {
     });
 
     afterEach(function () {
-        return Outfit.remove({});
+        return new Promise((resolve, reject) => {
+            console.warn('Deleting database');
+            mongoose.connection.dropDatabase()
+                .then(result => resolve(result))
+                .catch(err => reject(err));
+            });
     });
 
-    describe('/api/users/wardrobe/123', function() {
+    describe('/api/users/wardrobe/:id', function() {
         it('Should reject with no credentials', function() {
             return chai
                 .request(app)
-                .post('/api/users/wardrobe/123')
+                .post(`/api/users/wardrobe/${userID}`)
                 .send()
                 .then((res) => {
                     expect(res.ok).to.equal(false);
@@ -61,19 +71,20 @@ describe('Outfit endpoints', function() {
         it('Should reject if wrong userID', function() {
             return chai
                 .request(app)
-                .post('/api/users/wardrobe/123')
+                .post(`/api/users/wardrobe/${userID}`)
                 .send({skintone, shirt, pants, shoes, userID: "000001010"})
                 .then((res) => {
                     expect(res).to.has.status(401);
                 })
         });
 
-        it('Should return valid outfit', function() {
+        it.only('Should return valid outfit', function() {
+            console.log(token)
             return chai.request(app)
-            .get(`/api/users/wardrobe/5c3634f44b80856a60b4eb08`)
+            .get(`/api/users/wardrobe/${userID}`)
             .set('Authorization', `Bearer ${token}`)
             .then((res) => {
-                console.log(res)
+                // console.log(res)
                 expect(res).to.have.status(200);
                 expect(res.body).to.be.an(object);
             })
