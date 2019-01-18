@@ -17,7 +17,7 @@ router.use(bodyParser.json());
 //Set up CRUD operations for users and outfits
 //Post to register new user
 router.post('/', (req, res) => {
-    const requiredFields = ['username', 'password'];
+    const requiredFields = ['username', 'password', 'firstName', 'lastName'];
     const missingField = requiredFields.find(field => !(field in req.body));
 
     if (missingField) {
@@ -29,7 +29,7 @@ router.post('/', (req, res) => {
         });
     }
 
-    const stringFields = ['username', 'password'];
+    const stringFields = ['username', 'password', 'firstName', 'lastName'];
     const nonStringField = stringFields.find(
         field => field in req.body && typeof req.body[field] !== 'string'
     );
@@ -48,7 +48,7 @@ router.post('/', (req, res) => {
 //     expect that these will work without trimming (i.e. they want the password
 //     "foobar ", including the space at the end).
 //     */
-    const explicityTrimmedFields = ['username', 'password'];
+    const explicityTrimmedFields = ['username', 'password', 'firstName', 'lastName'];
     const nonTrimmedField = explicityTrimmedFields.find(
         field => req.body[field].trim() !== req.body[field]
     );
@@ -95,10 +95,10 @@ router.post('/', (req, res) => {
         });
     }
 
-    let {username, password } = req.body;
+    let {username, password, firstName, lastName } = req.body;
 
-    // firstName = firstName.trim();
-    // lastName = lastName.trim();
+    firstName = firstName.trim();
+    lastName = lastName.trim();
     // email = email.trim();
 
     return User.find({username})
@@ -118,9 +118,8 @@ router.post('/', (req, res) => {
             return User.create({
                 username,
                 password: hash,
-                // firstName,
-                // lastName,
-                // email
+                firstName,
+                lastName
             });
         })
         .then(user => {
