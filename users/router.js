@@ -256,7 +256,7 @@ router.put('/wardrobe/:id', jwtAuth, (req,res) => {
         return res.status(400).json({ message: message });
     }
     const toUpdate = {};
-    const requiredFields = ['id', 'skintone', 'shirt', 'pants', 'shoes'];
+    const requiredFields = ['userID', 'skintone', 'shirt', 'pants', 'shoes'];
 
     requiredFields.forEach(field => {
         if (field in req.body) {
