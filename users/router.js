@@ -1,23 +1,23 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const passport = require('passport');
+// const passport = require('passport');
 
-const { router: authRouter, localStrategy, jwtStrategy } = require('../auth');
+// const { router: authRouter, localStrategy, jwtStrategy } = require('../auth');
 const {User, Outfit} = require('./models');
 
 const router = express.Router();
 
-passport.use(localStrategy);
-passport.use(jwtStrategy);
+// passport.use(localStrategy);
+// passport.use(jwtStrategy);
 
-const jwtAuth = passport.authenticate('jwt', { session: false });
+// const jwtAuth = passport.authenticate('jwt', { session: false });
 
-router.use(bodyParser.json());
+const jsonParser = bodyParser.json()
 
 //Set up CRUD operations for users and outfits
 //Post to register new user
-router.post('/', (req, res) => {
-    const requiredFields = ['username', 'password', 'firstName', 'lastName'];
+router.post('/', jsonParser, (req, res) => {
+    const requiredFields = ['username', 'password'];
     const missingField = requiredFields.find(field => !(field in req.body));
 
     if (missingField) {
@@ -48,7 +48,7 @@ router.post('/', (req, res) => {
 //     expect that these will work without trimming (i.e. they want the password
 //     "foobar ", including the space at the end).
 //     */
-    const explicityTrimmedFields = ['username', 'password', 'firstName', 'lastName'];
+    const explicityTrimmedFields = ['username', 'password'];
     const nonTrimmedField = explicityTrimmedFields.find(
         field => req.body[field].trim() !== req.body[field]
     );
@@ -95,11 +95,10 @@ router.post('/', (req, res) => {
         });
     }
 
-    let {username, password, firstName, lastName } = req.body;
+    let {username, password, firstName = '', lastName = ''} = req.body;
 
     firstName = firstName.trim();
     lastName = lastName.trim();
-    // email = email.trim();
 
     return User.find({username})
         .count()
@@ -166,7 +165,7 @@ router.delete('/:id', (req, res) => {
         });
 });
 
-router.post('/wardrobe/:id', jwtAuth, (req,res) => {
+router.post('/wardrobe/:id', (req,res) => {
     const requiredFields = ['skintone', 'shirt', 'pants', 'shoes', 'userID'];
     const missingField = requiredFields.find(field => !(field in req.body));
     
@@ -228,7 +227,7 @@ router.get('/wardrobe', (req, res) => {
         .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
 });
 
-router.get('/wardrobe/:id', jwtAuth, (req, res) => {
+router.get('/wardrobe/:id', (req, res) => {
     const user = req.params.id; 
     Outfit
         .find({
@@ -238,7 +237,7 @@ router.get('/wardrobe/:id', jwtAuth, (req, res) => {
         .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
 });
 
-router.get('/wardrobe/single/:id', jwtAuth, (req, res) => {
+router.get('/wardrobe/single/:id', (req, res) => {
     const id = req.params.id; 
     Outfit
         .findById(id)
@@ -246,7 +245,7 @@ router.get('/wardrobe/single/:id', jwtAuth, (req, res) => {
         .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
 });
 
-router.put('/wardrobe/:id', jwtAuth, (req,res) => {
+router.put('/wardrobe/:id', (req,res) => {
     if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
         const message = (
             `Request path id and request body id values must match` + 
@@ -274,7 +273,7 @@ router.put('/wardrobe/:id', jwtAuth, (req,res) => {
     res.status(500).json({ message: `Internal server error ${err}` }));
 });
 
-router.delete('/wardrobe/:id', jwtAuth, (req, res) => {
+router.delete('/wardrobe/:id', (req, res) => {
     console.log(req.params.id);
 
     const outfitId = req.params.id;

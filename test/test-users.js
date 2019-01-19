@@ -256,7 +256,6 @@ describe('/api/users', function() {
                         expect(res).to.have.status(201);
                         expect(res.body).to.be.an('object');
                         expect(res.body).to.have.keys(
-                            'id',
                             'username',
                             'firstName',
                             'lastName'
@@ -292,7 +291,6 @@ describe('/api/users', function() {
                         expect(res).to.have.status(201);
                         expect(res.body).to.be.an('object');
                         expect(res.body).to.have.keys(
-                            'id',
                             'username',
                             'firstName',
                             'lastName'
@@ -328,10 +326,10 @@ describe('/api/users', function() {
                             lastName
                         },
                         {
-                            usernameB,
-                            passwordB,
-                            firstNameB,
-                            lastNameB
+                            username: usernameB,
+                            password: passwordB,
+                            firstName: firstNameB,
+                            lastName: lastNameB
                         }
                     )
                     .then(() => chai.request(app).get('/api/users'))
@@ -340,9 +338,9 @@ describe('/api/users', function() {
                         expect(res.body).to.be.an('array');
                         expect(res.body).to.have.length(2);
                         expect(res.body[0]).to.deep.equal({
-                            username,
-                            firstName,
-                            lastName
+                            username: username,
+                            firstName: firstName,
+                            lastName: lastName
                         });
                         expect(res.body[1]).to.deep.equal({
                             username: usernameB,

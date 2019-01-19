@@ -14,11 +14,7 @@ const UserSchema = mongoose.Schema({
         required: true
     },
     firstName: {type: String, default: ''},
-    lastName: {type: String, default: ''},
-    email: {
-        type: String,
-        default: ''
-    }
+    lastName: {type: String, default: ''}
 });
 
 const OutfitSchema = mongoose.Schema({
@@ -35,8 +31,7 @@ const OutfitSchema = mongoose.Schema({
         show: Boolean,
         type: String,
         color: String
-    },
-    userID: String
+    }
 });
 
 UserSchema.methods.validatePassword = function(password) {
@@ -49,7 +44,6 @@ UserSchema.statics.hashPassword = function(password) {
 
 UserSchema.methods.serialize = function() {
     return {
-        id: this._id,
         username: this.username || '',
         firstName: this.firstName || '',
         lastName: this.lastName || ''
@@ -58,7 +52,6 @@ UserSchema.methods.serialize = function() {
 
 OutfitSchema.methods.serialize = function() {
     return {
-        id: this.id,
         skintone: this.skintone,
         shirt: this.shirt,
         pants: this.pants,
