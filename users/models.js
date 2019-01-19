@@ -18,6 +18,7 @@ const UserSchema = mongoose.Schema({
 });
 
 const OutfitSchema = mongoose.Schema({
+    username: String,
     skintone: String,
     shirt: {
         type: String,
@@ -52,11 +53,11 @@ UserSchema.methods.serialize = function() {
 
 OutfitSchema.methods.serialize = function() {
     return {
+        username: this.username,
         skintone: this.skintone,
         shirt: this.shirt,
         pants: this.pants,
         shoes: this.shoes,
-        userID: this.userID
     }
 }
 

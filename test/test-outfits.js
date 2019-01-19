@@ -18,7 +18,6 @@ describe('Outfit endpoints', function() {
     const shirt = "{type: long-sleeve-shirt, color: #FFF}";
     const pants = "{type: jeans, color: #0000ff}";
     const shoes = "{show: true, type: boots, color: #000}";
-    const userID = "5c3634f44b80856a60b4eb08"
 
     before (function () {
         return runServer(TEST_DATABASE_URL);

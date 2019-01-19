@@ -139,9 +139,9 @@ router.get('/', (req, res) => {
         .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:username', (req, res) => {
     User
-        .findById(req.params.id)
+        .findById(req.params.username)
         .then(post => res.json(post.serialize()))
         .catch(err => {
             console.error(err);
@@ -149,10 +149,10 @@ router.get('/:id', (req, res) => {
         });
 });
 
-router.delete('/:id', (req, res) => {
-    console.log(req.params.id);
+router.delete('/:username', (req, res) => {
+    console.log(req.params.username);
     User
-        .findByIdAndRemove(req.params.id)
+        .findByIdAndRemove(req.params.username)
         .then(() => {
             console.log(`You have deleted post id:${req.params.id}`);
             res.status(204).end();
@@ -165,7 +165,7 @@ router.delete('/:id', (req, res) => {
         });
 });
 
-router.post('/wardrobe/:id', (req,res) => {
+router.post('/wardrobe/:username', (req,res) => {
     const requiredFields = ['skintone', 'shirt', 'pants', 'shoes', 'userID'];
     const missingField = requiredFields.find(field => !(field in req.body));
     
@@ -205,8 +205,7 @@ router.post('/wardrobe/:id', (req,res) => {
         skintone,
         shirt,
         pants,
-        shoes,
-        userID
+        shoes
     })
     .then(outfits => {
         console.log(outfits)
@@ -227,8 +226,8 @@ router.get('/wardrobe', (req, res) => {
         .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
 });
 
-router.get('/wardrobe/:id', (req, res) => {
-    const user = req.params.id; 
+router.get('/wardrobe/:username', (req, res) => {
+    const user = req.params.username; 
     Outfit
         .find({
             userID: user
