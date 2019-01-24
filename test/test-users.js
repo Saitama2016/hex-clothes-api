@@ -8,7 +8,7 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 
-describe('/api/users', function() {
+describe('/api/users/wardrobe', function() {
     const username = 'exampleUser';
     const password = 'examplePass';
     const firstName = 'Example';
@@ -32,7 +32,7 @@ describe('/api/users', function() {
         return User.remove({});
     });
 
-    describe.only('/api/users', function() {
+    describe('/api/users', function() {
         describe('POST', function() {
             it('Should reject users with missing username', function() {
                 return chai

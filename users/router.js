@@ -154,7 +154,7 @@ router.delete('/:username', (req, res) => {
     User
         .findByIdAndRemove(req.params.username)
         .then(() => {
-            console.log(`You have deleted post id:${req.params.id}`);
+            console.log(`You have deleted username username:${req.params.username}`);
             res.status(204).end();
         })
         .catch(err => {
@@ -178,7 +178,7 @@ router.post('/wardrobe/:username', (req,res) => {
         });
     }
 
-    const user = req.params.id;
+    const user = req.params.username;
 
     if(req.body.userID != user) {
         return res.status(500).json({

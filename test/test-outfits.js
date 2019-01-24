@@ -13,7 +13,7 @@ const expect = chai.expect;
 let token;
 chai.use(chaiHttp);
 
-describe('Outfit endpoints', function() {
+describe('/api/wardrobe', function() {
     const skintone = '#c68642';
     const shirt = "{type: long-sleeve-shirt, color: #FFF}";
     const pants = "{type: jeans, color: #0000ff}";
