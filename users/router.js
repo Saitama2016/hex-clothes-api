@@ -1,20 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-// const passport = require('passport');
 
-// const { router: authRouter, localStrategy, jwtStrategy } = require('../auth');
 const {User} = require('./models');
-
 const router = express.Router();
-
-// passport.use(localStrategy);
-// passport.use(jwtStrategy);
-
-// const jwtAuth = passport.authenticate('jwt', { session: false });
-
 const jsonParser = bodyParser.json()
 
-//Set up CRUD operations for users and outfits
+//Set up CRUD operations for users
 //Post to register new user
 router.post('/', jsonParser, (req, res) => {
     const requiredFields = ['username', 'password'];
