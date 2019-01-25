@@ -1,11 +1,10 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
 
 
 const {closeServer, app, runServer} = require('../server');
-const { Outfit } = require('../users');
+const { Outfit } = require('../outfits');
 const { TEST_DATABASE_URL } = require('../config');
 
 const session = chai.request.agent(app)
@@ -13,11 +12,13 @@ const expect = chai.expect;
 let token;
 chai.use(chaiHttp);
 
-describe('/api/wardrobe', function() {
-    const skintone = '#c68642';
-    const shirt = "{type: long-sleeve-shirt, color: #FFF}";
-    const pants = "{type: jeans, color: #0000ff}";
-    const shoes = "{show: true, type: boots, color: #000}";
+describe.only('/api/outfits', function() {
+    const username = "FinnAndJake2010";
+    const password = "AdventureTime2018";
+    const skintone = '#C68642';
+    const shirt = `{type: "long-sleeve-shirt", color: "#FFF"}`;
+    const pants = `{type: "jeans", color: "#0000ff"}`;
+    const shoes = `{show: true, type: "boots", color: "#000"}`;
 
     before (function () {
         return runServer(TEST_DATABASE_URL);
@@ -30,8 +31,8 @@ describe('/api/wardrobe', function() {
     beforeEach(function () {
             return session.post('/api/auth/login')
                 .send({
-                    "username": "HulkBuster2015", 
-                    "password": "SaintSeiya2016"})
+                    "username": username, 
+                    "password": password})
                 .then(res => {
                     console.log(res);
                     token = res})
@@ -40,47 +41,36 @@ describe('/api/wardrobe', function() {
                         skintone,
                         shirt,
                         pants,
-                        shoes,
-                        userID
+                        shoes
                     })
                 })
     });
 
     afterEach(function () {
-        return new Promise((resolve, reject) => {
-            console.warn('Deleting database');
-            mongoose.connection.dropDatabase()
-                .then(result => resolve(result))
-                .catch(err => reject(err));
-            });
+        return Outfit.remove({})
     });
 
-    describe('/api/users/wardrobe/:id', function() {
-        it('Should reject with no credentials', function() {
+    describe('/api/outfits', function() {
+        it('Should reject with missing skintone', function() {
             return chai
                 .request(app)
-                .post(`/api/users/wardrobe/${userID}`)
-                .send()
-                .then((res) => {
-                    expect(res.ok).to.equal(false);
-                    expect(res).to.has.status(401);
+                .post('/api/outfits')
+                .send({
+                    shirt,
+                    pants,
+                    shoes
                 })
-        });
-
-        it('Should reject if wrong userID', function() {
-            return chai
-                .request(app)
-                .post(`/api/users/wardrobe/${userID}`)
-                .send({skintone, shirt, pants, shoes, userID: "000001010"})
                 .then((res) => {
-                    expect(res).to.has.status(401);
+                    console.log(res)
+                    expect(res.ok).to.equal(false);
+                    expect(res).to.has.status(422);
                 })
         });
 
         it('Should return valid outfit', function() {
             console.log(token)
             return chai.request(app)
-            .get(`/api/users/wardrobe/${userID}`)
+            .get('/')
             .set('Authorization', `Bearer ${token}`)
             .then((res) => {
                 // console.log(res)

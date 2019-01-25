@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 // const passport = require('passport');
 
 // const { router: authRouter, localStrategy, jwtStrategy } = require('../auth');
-const {User, Outfit} = require('./models');
+const {User} = require('./models');
 
 const router = express.Router();
 
@@ -139,9 +139,9 @@ router.get('/', (req, res) => {
         .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
 });
 
-router.get('/:username', (req, res) => {
+router.get('/:id', (req, res) => {
     User
-        .findById(req.params.username)
+        .findById(req.params.id)
         .then(post => res.json(post.serialize()))
         .catch(err => {
             console.error(err);
@@ -149,12 +149,12 @@ router.get('/:username', (req, res) => {
         });
 });
 
-router.delete('/:username', (req, res) => {
-    console.log(req.params.username);
+router.delete('/:id', (req, res) => {
+    console.log(req.params.id);
     User
-        .findByIdAndRemove(req.params.username)
+        .findByIdAndRemove(req.params.id)
         .then(() => {
-            console.log(`You have deleted username username:${req.params.username}`);
+            console.log(`You have deleted username id:${req.params.id}`);
             res.status(204).end();
         })
         .catch(err => {
@@ -163,127 +163,6 @@ router.delete('/:username', (req, res) => {
                 message: 'Internal server error' 
             })
         });
-});
-
-router.post('/wardrobe/:username', (req,res) => {
-    const requiredFields = ['skintone', 'shirt', 'pants', 'shoes', 'userID'];
-    const missingField = requiredFields.find(field => !(field in req.body));
-    
-    if (missingField) {
-        return res.status(422).json({
-            code: 422,
-            reason: 'ValidationError',
-            message: 'Missing field',
-            location: missingField
-        });
-    }
-
-    const user = req.params.username;
-
-    if(req.body.userID != user) {
-        return res.status(500).json({
-            code: 400,
-            reason: 'ValidationError',
-            message: 'id must match endpont',
-            location: 'userID'
-        });
-    }
-
-    let userID = req.body.userID;
-    let skintone = req.body['skintone'];
-    let shirt = req.body['shirt'];
-    let pants = req.body['pants'];
-    let shoes = req.body['shoes'];
-
-    skintone = skintone.trim();
-    shirt = shirt.trim();
-    pants = pants.trim();
-    shoes = shoes.trim();
-    userID = userID.trim();
-
-    return Outfit.create({
-        skintone,
-        shirt,
-        pants,
-        shoes
-    })
-    .then(outfits => {
-        console.log(outfits)
-        return res.status(201).json(outfits.serialize())
-    })
-    .catch(err => {
-        if (err.reason === 'ValidationError') {
-            return res.status(err.code).json(err);
-        }
-        console.log(err);
-        res.status(500).json({code: 500, message: `Internal server error: ${err}`});
-    });
-});
-
-router.get('/wardrobe', (req, res) => {
-    return Outfit.find()
-        .then(outfits => res.json(outfits.map(outfit => outfit.serialize())))
-        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
-});
-
-router.get('/wardrobe/:username', (req, res) => {
-    const user = req.params.username; 
-    Outfit
-        .find({
-            userID: user
-        })
-        .then(outfits => res.json(outfits.map(outfit => outfit.serialize())))
-        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
-});
-
-router.get('/wardrobe/single/:id', (req, res) => {
-    const id = req.params.id; 
-    Outfit
-        .findById(id)
-        .then(outfit => res.json(outfit.serialize()))
-        .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
-});
-
-router.put('/wardrobe/:id', (req,res) => {
-    if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
-        const message = (
-            `Request path id and request body id values must match` + 
-            `(${req.body.id}) must match`
-        );
-        console.error(message);
-        return res.status(400).json({ message: message });
-    }
-    const toUpdate = {};
-    const requiredFields = ['userID', 'skintone', 'shirt', 'pants', 'shoes'];
-
-    requiredFields.forEach(field => {
-        if (field in req.body) {
-            toUpdate[field] = req.body[field];
-        }
-    });
-
-    Outfit
-    .findByIdAndUpdate(req.params.id, { $set: toUpdate })
-    .then(() => {
-        console.log(`Updating user \`${req.params.id}\``);
-        res.status(204).end();
-    })
-    .catch((err) => 
-    res.status(500).json({ message: `Internal server error ${err}` }));
-});
-
-router.delete('/wardrobe/:id', (req, res) => {
-    console.log(req.params.id);
-
-    const outfitId = req.params.id;
-
-    Outfit
-    .findByIdAndRemove(outfitId)
-    .then(() => {
-        console.log(`You have deleted user vacation id:${outfitId}`);
-        res.status(204).end();
-    })
-    .catch(err => res.status(500).json({ message: `Internal server error: ${err}` }));
 });
 
 module.exports = {router};

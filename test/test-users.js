@@ -8,7 +8,7 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 
-describe('/api/users/wardrobe', function() {
+describe('/api/users/', function() {
     const username = 'exampleUser';
     const password = 'examplePass';
     const firstName = 'Example';
@@ -258,7 +258,8 @@ describe('/api/users/wardrobe', function() {
                         expect(res.body).to.have.keys(
                             'username',
                             'firstName',
-                            'lastName'
+                            'lastName',
+                            'id'
                         );
                         expect(res.body.username).to.equal(username);
                         expect(res.body.firstName).to.equal(firstName);
@@ -293,7 +294,8 @@ describe('/api/users/wardrobe', function() {
                         expect(res.body).to.have.keys(
                             'username',
                             'firstName',
-                            'lastName'
+                            'lastName',
+                            'id'
                         );
                         expect(res.body.username).to.equal(username);
                         expect(res.body.firstName).to.equal(firstName);
@@ -337,16 +339,18 @@ describe('/api/users/wardrobe', function() {
                         expect(res).to.have.status(200);
                         expect(res.body).to.be.an('array');
                         expect(res.body).to.have.length(2);
-                        expect(res.body[0]).to.deep.equal({
-                            username: username,
-                            firstName: firstName,
-                            lastName: lastName
-                        });
-                        expect(res.body[1]).to.deep.equal({
-                            username: usernameB,
-                            firstName: firstNameB,
-                            lastName: lastNameB
-                        });
+                        expect(res.body[0]).to.have.keys(
+                            'username',
+                            'firstName',
+                            'lastName',
+                            'id'
+                        );
+                        expect(res.body[1]).to.have.keys(
+                            'username',
+                            'firstName',
+                            'lastName',
+                            'id'
+                        );
                     });
                 });
             });

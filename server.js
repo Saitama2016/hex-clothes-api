@@ -28,6 +28,7 @@ app.use(function (req, res, next) {
 const { PORT, CLIENT_ORIGIN, DATABASE_URL } = require('./config');
 
 const { router: usersRouter } = require('./users');
+const { router: outfitsRouter } = require('./outfits');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
 
 
@@ -38,6 +39,7 @@ passport.use(jwtStrategy);
 const jwtAuth = passport.authenticate('jwt', { session: false});
 
 app.use('/api/users', usersRouter);
+app.use('/api/outfits', outfitsRouter);
 app.use('/api/auth', authRouter);
 
 app.get('/api/protected', jwtAuth, (req,res) => {

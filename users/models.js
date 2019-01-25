@@ -17,24 +17,6 @@ const UserSchema = mongoose.Schema({
     lastName: {type: String, default: ''}
 });
 
-const OutfitSchema = mongoose.Schema({
-    username: String,
-    skintone: String,
-    shirt: {
-        type: String,
-        color: String
-    },
-    pants: {
-        type: String,
-        color: String
-    },
-    shoes: {
-        show: Boolean,
-        type: String,
-        color: String
-    }
-});
-
 UserSchema.methods.validatePassword = function(password) {
     return bcrypt.compare(password, this.password);
 };
@@ -47,21 +29,11 @@ UserSchema.methods.serialize = function() {
     return {
         username: this.username || '',
         firstName: this.firstName || '',
-        lastName: this.lastName || ''
+        lastName: this.lastName || '',
+        id: this._id
     };
 };
 
-OutfitSchema.methods.serialize = function() {
-    return {
-        username: this.username,
-        skintone: this.skintone,
-        shirt: this.shirt,
-        pants: this.pants,
-        shoes: this.shoes,
-    }
-}
-
 const User = mongoose.model('User', UserSchema);
-const Outfit = mongoose.model('Outfit', OutfitSchema);
 
-module.exports = { User, Outfit };
+module.exports = { User };
