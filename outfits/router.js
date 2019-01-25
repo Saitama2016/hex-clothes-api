@@ -84,7 +84,7 @@ router.put('/:id', jwtAuth, (req,res) => {
     Outfit
     .findByIdAndUpdate(req.params.id, { $set: toUpdate })
     .then(() => {
-        console.log(`Updating user \`${req.params.id}\``);
+        console.log(`Updating outfit \`${req.params.id}\``);
         res.status(204).end();
     })
     .catch((err) => 
@@ -99,7 +99,7 @@ router.delete('/:id', jwtAuth, (req, res) => {
     Outfit
     .findByIdAndRemove(outfitId)
     .then(() => {
-        console.log(`You have deleted user vacation id:${outfitId}`);
+        console.log(`You have deleted outfit id:${outfitId}`);
         res.status(204).end();
     })
     .catch(err => res.status(500).json({ message: `Internal server error: ${err}` }));
