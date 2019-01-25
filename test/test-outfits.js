@@ -1,5 +1,6 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
 
@@ -12,9 +13,18 @@ const expect = chai.expect;
 let token;
 chai.use(chaiHttp);
 
-describe.only('/api/outfits', function() {
-    const username = "FinnAndJake2010";
-    const password = "AdventureTime2018";
+function tearDownDb() {
+    return new Promise((resolve, reject) => {
+    console.warn('Deleting database');
+    mongoose.connection.dropDatabase()
+        .then(result => resolve(result))
+        .catch(err => reject(err));
+    });
+}
+
+describe('/api/outfits', function() {
+    const username = 'exampleUser';
+    const password = 'examplePass';
     const skintone = '#C68642';
     const shirt = `{type: "long-sleeve-shirt", color: "#FFF"}`;
     const pants = `{type: "jeans", color: "#0000ff"}`;
@@ -24,19 +34,12 @@ describe.only('/api/outfits', function() {
         return runServer(TEST_DATABASE_URL);
     });
 
-    after (function () {
-        return closeServer();
-    });
-
     beforeEach(function () {
             return session.post('/api/auth/login')
-                .send({
-                    "username": username, 
-                    "password": password})
-                .then(res => {
-                    console.log(res);
-                    token = res})
-                .then(() => {
+                .send({ username, password })
+                .then(res => token = res)
+                .then((token) => {
+                    // console.log(token)
                 return Outfit.create({
                         skintone,
                         shirt,
@@ -47,28 +50,30 @@ describe.only('/api/outfits', function() {
     });
 
     afterEach(function () {
-        return Outfit.remove({})
+        return tearDownDb();
+    });
+
+    after (function () {
+        return closeServer();
     });
 
     describe('/api/outfits', function() {
         it('Should reject with missing skintone', function() {
             return chai
                 .request(app)
-                .post('/api/outfits')
                 .send({
                     shirt,
                     pants,
                     shoes
                 })
+                .post('/api/outfits')
                 .then((res) => {
-                    console.log(res)
                     expect(res.ok).to.equal(false);
                     expect(res).to.has.status(422);
                 })
         });
 
         it('Should return valid outfit', function() {
-            console.log(token)
             return chai.request(app)
             .get('/')
             .set('Authorization', `Bearer ${token}`)
