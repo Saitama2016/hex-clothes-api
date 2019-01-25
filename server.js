@@ -34,7 +34,6 @@ const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
 
 passport.use(localStrategy);
 passport.use(jwtStrategy);
-// const PORT =  process.env.PORT || 3000;
 
 const jwtAuth = passport.authenticate('jwt', { session: false});
 
@@ -89,7 +88,5 @@ function closeServer() {
 if (require.main === module) {
     runServer(DATABASE_URL).catch(err => console.error(err));
 }
-
-// app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 
 module.exports = { app, runServer, closeServer };
