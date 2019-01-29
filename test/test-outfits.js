@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 
 
 const {closeServer, app, runServer} = require('../server');
+const { User } = require('../users');
 const { Outfit } = require('../outfits');
 const { TEST_DATABASE_URL } = require('../config');
 
@@ -22,9 +23,10 @@ function tearDownDb() {
     });
 }
 
-describe('/api/outfits', function() {
+describe.only('/api/outfits/', function() {
     const username = 'exampleUser';
     const password = 'examplePass';
+    const email = 'example@gmail.com';
     const skintone = '#C68642';
     const shirt = `{type: "long-sleeve-shirt", color: "#FFF"}`;
     const pants = `{type: "jeans", color: "#0000ff"}`;
@@ -35,11 +37,17 @@ describe('/api/outfits', function() {
     });
 
     beforeEach(function () {
-            return session.post('/api/auth/login')
-                .send({ username, password })
+       return User.hashPassword(password).then(password => 
+            User.create({
+                username,
+                password,
+                email
+            }),  
+            session.post('/api/auth/login')
+                .send({username, password })
                 .then(res => token = res)
                 .then((token) => {
-                    // console.log(token)
+                    console.log(token)
                 return Outfit.create({
                         skintone,
                         shirt,
@@ -47,6 +55,7 @@ describe('/api/outfits', function() {
                         shoes
                     })
                 })
+       )
     });
 
     afterEach(function () {
@@ -61,12 +70,12 @@ describe('/api/outfits', function() {
         it('Should reject with missing skintone', function() {
             return chai
                 .request(app)
+                .post('/api/outfits')
                 .send({
                     shirt,
                     pants,
                     shoes
                 })
-                .post('/api/outfits')
                 .then((res) => {
                     expect(res.ok).to.equal(false);
                     expect(res).to.has.status(422);
