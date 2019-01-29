@@ -22,14 +22,14 @@ describe('/api/users/', function() {
         return runServer();
     });
 
-    after(function() {
-        return closeServer();
-    });
-
     beforeEach(function() {});
 
     afterEach(function() {
         return User.remove({});
+    });
+
+    after(function() {
+        return closeServer();
     });
 
     describe('/api/users', function() {

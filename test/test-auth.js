@@ -10,19 +10,13 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 
-describe('Auth endpoints', function () {
+describe.only('Auth endpoints', function () {
     const username = 'exampleUser';
     const password = 'examplePass';
     const email = 'example@gmail.com';
 
-
-
     before (function () {
         return runServer(TEST_DATABASE_URL);
-    });
-
-    after(function () {
-        return closeServer();
     });
 
     beforeEach(function () {
@@ -37,6 +31,10 @@ describe('Auth endpoints', function () {
 
     afterEach(function () {
         return User.remove({});
+    });
+
+    after(function () {
+        return closeServer();
     });
 
     describe('/api/auth/login', function () {
