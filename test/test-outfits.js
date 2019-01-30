@@ -23,9 +23,10 @@ function tearDownDb() {
     });
 }
 
-describe.only('/api/outfits/', function() {
+describe.only('/api/users/:id/outfits', function() {
     const username = 'exampleUser';
     const password = 'examplePass';
+    const hash = User.hashPassword(password);
     const email = 'example@gmail.com';
     const skintone = '#C68642';
     const shirt = `{type: "long-sleeve-shirt", color: "#FFF"}`;
@@ -37,14 +38,17 @@ describe.only('/api/outfits/', function() {
     });
 
     beforeEach(function () {
-       return User.hashPassword(password).then(password => 
-            User.create({
+        return User.hashPassword(password)
+        .then(hash => 
+             User.create({
                 username,
-                password,
+                password: hash,
                 email
-            }),  
-            session.post('/api/auth/login')
-                .send({username, password })
+            })
+        )
+        .then((username, password) => {
+            return session.post('/api/auth/login')
+                .send({username, password})
                 .then(res => token = res)
                 .then((token) => {
                     console.log(token)
@@ -55,7 +59,7 @@ describe.only('/api/outfits/', function() {
                         shoes
                     })
                 })
-       )
+            })
     });
 
     afterEach(function () {
@@ -66,11 +70,11 @@ describe.only('/api/outfits/', function() {
         return closeServer();
     });
 
-    describe('/api/outfits', function() {
+    describe('/api/users/:id/outfits', function() {
         it('Should reject with missing skintone', function() {
             return chai
                 .request(app)
-                .post('/api/outfits')
+                .post('/api/users/:id/outfits')
                 .send({
                     shirt,
                     pants,
@@ -84,7 +88,7 @@ describe.only('/api/outfits/', function() {
 
         it('Should return valid outfit', function() {
             return chai.request(app)
-            .get('/')
+            .get('/api/users/:id/outfits')
             .set('Authorization', `Bearer ${token}`)
             .then((res) => {
                 // console.log(res)
