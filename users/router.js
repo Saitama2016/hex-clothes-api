@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 
 const {User} = require('./models');
 const router = express.Router();
-const jsonParser = bodyParser.json()
+const jsonParser = bodyParser.json();
 
 //Set up CRUD operations for users
 //Post to register new user
@@ -139,6 +139,8 @@ router.get('/:id', (req, res) => {
             res.status(500).json({ message: `Internal server error: ${err}` });
         });
 });
+
+router.use('/:id/outfits', require('../outfits').router)
 
 router.delete('/:id', (req, res) => {
     console.log(req.params.id);

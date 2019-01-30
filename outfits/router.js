@@ -55,14 +55,14 @@ router.get('/', jwtAuth, (req, res) => {
         .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:outfitId', (req, res) => {
     Outfit
         .findById(req.params.id)
         .then(outfit => {res.json(outfit.serialize())})
         .catch(err => res.status(404).json({message: `Internal server error: ${err}`}));
 });
 
-router.put('/:id', jwtAuth, (req,res) => {
+router.put('/:outfitId', jwtAuth, (req,res) => {
     if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
         const message = (
             `Request path id and request body id values must match` + 
@@ -91,7 +91,7 @@ router.put('/:id', jwtAuth, (req,res) => {
     res.status(500).json({ message: `Internal server error ${err}` }));
 });
 
-router.delete('/:id', jwtAuth, (req, res) => {
+router.delete('/:outfitId', jwtAuth, (req, res) => {
     console.log(req.params.id);
 
     const outfitId = req.params.id;
