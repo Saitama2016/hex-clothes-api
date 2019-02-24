@@ -55,14 +55,14 @@ router.get('/', jwtAuth, (req, res) => {
         .catch(err => res.status(500).json({message: `Internal server error: ${err}`}));
 });
 
-router.get('/:outfitId', (req, res) => {
+router.get('/:id', (req, res) => {
     Outfit
         .findById(req.params.id)
         .then(outfit => {res.json(outfit.serialize())})
         .catch(err => res.status(404).json({message: `Internal server error: ${err}`}));
 });
 
-router.put('/:outfitId', jwtAuth, (req,res) => {
+router.put('/:id', jwtAuth, (req,res) => {
     if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
         const message = (
             `Request path id and request body id values must match` + 
@@ -91,15 +91,15 @@ router.put('/:outfitId', jwtAuth, (req,res) => {
     res.status(500).json({ message: `Internal server error ${err}` }));
 });
 
-router.delete('/:outfitId', jwtAuth, (req, res) => {
+router.delete('/:id', jwtAuth, (req, res) => {
     console.log(req.params.id);
 
-    const outfitId = req.params.id;
+    const id = req.params.id;
 
     Outfit
-    .findByIdAndRemove(outfitId)
+    .findByIdAndRemove(id)
     .then(() => {
-        console.log(`You have deleted outfit id:${outfitId}`);
+        console.log(`You have deleted outfit id:${id}`);
         res.status(204).end();
     })
     .catch(err => res.status(500).json({ message: `Internal server error: ${err}` }));
