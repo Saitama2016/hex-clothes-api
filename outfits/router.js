@@ -10,7 +10,7 @@ const jwtAuth = passport.authenticate('jwt', { session: false });
 
 
 router.post('/', jwtAuth, jsonParser, (req,res) => {
-    const requiredFields = ['skintone', 'shirt', 'pants', 'shoes', 'userID'];
+    const requiredFields = ['skintone', 'shirtColor', 'shirtType', 'longSleeveVisibility', 'shortSleeveVisibility', 'pantsColor', 'pantsType', 'shoesColor', 'userID'];
     const missingField = requiredFields.find(field => !(field in req.body));
     
     if (missingField) {
@@ -22,16 +22,30 @@ router.post('/', jwtAuth, jsonParser, (req,res) => {
         });
     }
 
+/*let {
+  thingOne,
+  thingTwo,
+  ...
+} = req.body */
+
     let skintone = req.body['skintone'];
-    let shirt = req.body['shirt'];
-    let pants = req.body['pants'];
-    let shoes = req.body['shoes'];
+    let shirtColor = req.body['shirtColor'];
+    let shirtType = req.body['shirtType'];
+    let longSleeveVisibility = req.body['longSleeveVisibility'];
+    let shortSleeveVisibility = req.body['shortSleeveVisibility'];
+    let pantsColor = req.body['pantsColor'];
+    let pantsType = req.body['pantsType'];
+    let shoesColor = req.body['shoesColor'];
 
     return Outfit.create({
         skintone,
-        shirt,
-        pants,
-        shoes,
+        shirtColor,
+        shirtType,
+        longSleeveVisibility,
+        shortSleeveVisibility,
+        pantsColor,
+        pantsType,
+        shoesColor,
         user: req.user.id
     })
     .then(outfits => {
@@ -72,7 +86,7 @@ router.put('/:id', jwtAuth, (req,res) => {
         return res.status(400).json({ message: message });
     }
     const toUpdate = {};
-    const requiredFields = ['skintone', 'shirt', 'pants', 'shoes'];
+    const requiredFields = ['skintone', 'shirtColor', 'shirtType', 'longSleeveVisibility', 'shortSleeveVisibility', 'pantsColor', 'pantsType', 'shoesColor'];
 
     requiredFields.forEach(field => {
         if (field in req.body) {

@@ -140,7 +140,7 @@ router.get('/:id', (req, res) => {
         });
 });
 
-router.use('/:id/outfits', require('../outfits').router)
+// router.use('/:id/outfits', require('../outfits').router)
 
 router.delete('/:id', (req, res) => {
     console.log(req.params.id);
