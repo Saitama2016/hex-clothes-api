@@ -7,20 +7,32 @@ const OutfitSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    shirt: {
+    shirtColor: {
         type: String,
-        color: String,
         required: true
     },
-    pants: {
+    shirtType: {
         type: String,
-        color: String,
         required: true
     },
-    shoes: {
-        show: Boolean,
+    longSleeveVisibility: {
+        type: Boolean,
+        required: true
+    },
+    shortSleeveVisibility: {
+        type: Boolean,
+        required: true
+    },
+    pantsColor: {
         type: String,
-        color: String,
+        required: true
+    },
+    pantsType: {
+        type: String,
+        required: true
+    },
+    shoesColor: {
+        type: String,
         required: true
     },
     user: {type: mongoose.SchemaTypes.ObjectId, ref: 'User'},
@@ -30,9 +42,13 @@ OutfitSchema.methods.serialize = function() {
     return {
         id: this.id,
         skintone: this.skintone,
-        shirt: this.shirt,
-        pants: this.pants,
-        shoes: this.shoes,
+        shirtColor: this.shirtColor,
+        shirtType: this.shirtType,
+        longSleeveVisibility: this.longSleeveVisibility,
+        shortSleeveVisibility: this.shortSleeveVisibility,
+        pantsType: this.pantsType,
+        pantsColor: this.pantsColor,
+        shoesColor: this.shoesColor
     }
 }
 
